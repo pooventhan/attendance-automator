@@ -1,7 +1,12 @@
 import React from "react";
 import { read, utils } from 'xlsx';
 
-class FileUpload extends React.Component<{}, {file: File}> {
+interface FileUploadProps {
+    masterList: string[],
+    resultCallback(list: string[]): void
+}
+
+class FileUpload extends React.Component<FileUploadProps, {file: File}> {
 
     constructor(props: any) {
         super(props);
