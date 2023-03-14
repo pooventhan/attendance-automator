@@ -10,7 +10,9 @@ class MasterIdList extends React.Component<MasterIdListProps, {}> {
     }
 
     handleOnChange = (event: any) => {
-        this.props.getList(event.target.value);
+        const value = event.target.value as string;
+        const list = value.trim().split("\n");
+        this.props.getList(list);
     }
 
     render = () => {

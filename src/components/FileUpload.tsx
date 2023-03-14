@@ -3,7 +3,12 @@ import { read, utils } from 'xlsx';
 
 interface FileUploadProps {
     masterList: string[],
-    resultCallback(list: string[]): void
+    resultCallback(result: string[]): void
+}
+
+interface Attendance {
+    Email: string,
+    "Are you here?": string
 }
 
 class FileUpload extends React.Component<FileUploadProps, {file: File}> {
@@ -17,16 +22,47 @@ class FileUpload extends React.Component<FileUploadProps, {file: File}> {
         // Binding this keyword.
         this.handleFileInputChange = this.handleFileInputChange.bind(this)
         this.performWork = this.performWork.bind(this)
-      }
+    }
+
+    findDuplicates(arr: string[]) {
+        return arr.filter((currentValue, currentIndex) =>
+        arr.indexOf(currentValue) !== currentIndex);
+    }
 
     async performWork(){
         const file = this.state.file;
-        /* get raw data */
         const data = await file.arrayBuffer();
-        /* data is an ArrayBuffer */
         const workbook = read(data);
-        /* do something with the workbook here */
-        console.log(utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
+        const workbookJson = utils.sheet_to_json<Attendance>(workbook.Sheets[workbook.SheetNames[0]]);
+        console.log(`Workbook size: (${workbookJson.length})`);
+
+        if(workbookJson.length === 0){
+            this.props.resultCallback([`Please select a workbook to continue or ensure it contains valid records.`]);
+            return;
+        }
+
+        const duplicated = this.findDuplicates(this.props.masterList);
+        if(duplicated.length !== 0){
+            this.props.resultCallback([`There are some duplicated items in master list: ${duplicated.toString()}`]);
+            return;
+        }
+
+        if(this.props.masterList.length < workbookJson.length){
+            this.props.resultCallback([`Master list record count (${this.props.masterList.length}) is lesser than attendance record (${workbookJson.length}) !`]);
+            return;
+        }
+        
+        const mapped = this.props.masterList.map(id => {
+            const record = workbookJson.find(attendance => {
+                const strippedEmail = attendance.Email.substring(0, attendance.Email.lastIndexOf('@'));
+                return strippedEmail.includes(id) && attendance["Are you here?"] === "Yes, I'm here!";
+            });
+
+            return record ? "1" : "0";
+        }).join('\n')
+
+        this.props.resultCallback([mapped]);
+        return;
     }
 
     handleFileInputChange(event: any) {

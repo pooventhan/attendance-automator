@@ -13,7 +13,7 @@ class Automator extends React.Component<{}, AutomatorState > {
         super(props);
 
         // Set initial state.
-        this.state = { masterIdList: [], mapResult: [] };
+        this.state = { masterIdList:[], mapResult:[] };
     }
 
     getMasterIdList = (list: string[]) => {
@@ -35,7 +35,7 @@ class Automator extends React.Component<{}, AutomatorState > {
                         <FileUpload masterList={this.state.masterIdList} resultCallback={ this.getResult }/>
                     </div>
                     <div className="col-sm">
-                        <AttendanceMapResult/>
+                        <AttendanceMapResult result={this.state.mapResult}/>
                     </div>
                 </div>
             </div>
