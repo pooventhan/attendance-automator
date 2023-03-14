@@ -7,8 +7,7 @@ interface FileUploadProps {
 }
 
 interface Attendance {
-    Email: string,
-    "Are you here?": string
+    Email: string
 }
 
 class FileUpload extends React.Component<FileUploadProps, {file: File}> {
@@ -55,7 +54,7 @@ class FileUpload extends React.Component<FileUploadProps, {file: File}> {
         const mapped = this.props.masterList.map(id => {
             const record = workbookJson.find(attendance => {
                 const strippedEmail = attendance.Email.substring(0, attendance.Email.lastIndexOf('@'));
-                return strippedEmail.includes(id) && attendance["Are you here?"] === "Yes, I'm here!";
+                return strippedEmail.includes(id);
             });
 
             return record ? "1" : "0";
